@@ -1,0 +1,286 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NexTeckLib</name>
+    </assembly>
+    <members>
+        <member name="T:NexTeckLib.ConfigController">
+            <summary>
+            Classe que controla e gerencia as configurações do software
+            </summary>
+        </member>
+        <member name="M:NexTeckLib.ConfigController.Salvar(NexTeckLib.ObjetoConfig)">
+            <summary>
+            Salva as configurações de um objeto de configuração
+            </summary>
+        </member>
+        <member name="M:NexTeckLib.ConfigController.Carregar(System.Type)">
+            <summary>
+            Carrega um objeto de configuração de um diretório específico
+            </summary>
+            <param name="tipo">O tipo da configuração que será carregada</param>
+        </member>
+        <member name="M:NexTeckLib.ConfigController.CarregarOuCriar(System.Type)">
+            <summary>
+            Carrega um objeto de configuração de um diretório específico, se ele não existe então é criado
+            </summary>
+            <param name="dir">O diretorio a ser carregado</param>
+        </member>
+        <member name="T:NexTeckLib.Configuracoes">
+            <summary>
+            Armazena as configurações gerais necessárias para o funcionamento da biblioteca
+            </summary>
+        </member>
+        <member name="P:NexTeckLib.Configuracoes.NomePrograma">
+            <summary>
+            Nome do programa
+            </summary>
+        </member>
+        <member name="P:NexTeckLib.Configuracoes.TipoProjeto">
+            <summary>
+            Descrimina se o projeto é Windows Forms, Console, WPF, etc
+            </summary>
+        </member>
+        <member name="F:NexTeckLib.Configuracoes.ConfiguracoesPessoais">
+            <summary>
+            Configurações personalizadas do software
+            </summary>
+        </member>
+        <member name="F:NexTeckLib.Configuracoes.configurado">
+            <summary>
+            Flag de configuração
+            </summary>
+        </member>
+        <member name="F:NexTeckLib.Configuracoes.alertado">
+            <summary>
+            Flag para não alertar mais de uma vez de que precisa configurar
+            </summary>
+        </member>
+        <member name="M:NexTeckLib.Configuracoes.Configurar(System.String,NexTeckLib.TipoProjeto)">
+            <summary>
+            Define as variáveis de configuração
+            </summary>
+            <param name="nomePrograma">O nome deste software</param>
+            <param name="tipoProjeto">Tipo do projeto</param>
+        </member>
+        <member name="T:NexTeckLib.TipoProjeto">
+            <summary>
+            Tipo do projeto, serve para a biblioteca resolver problemas de referências
+            </summary>
+        </member>
+        <member name="T:NexTeckLib.ObjetoConfig">
+            <summary>
+            Objeto Abstrato que possui as configurações para serem salvas
+            lembrando que para toda classe filha dessa ela deve ser Serializavel
+            Andrei 27/10/2015
+            </summary>
+        </member>
+        <member name="M:NexTeckLib.ObjetoConfig.DefinirPadrao">
+            <summary>
+            Define as configurações padrão para esse objeto
+            </summary>
+        </member>
+        <member name="M:NexTeckLib.ObjetoConfig.Salvar">
+            <summary>
+            Salva a configuração atual
+            </summary>
+        </member>
+        <member name="M:NexTeckLib.ObjetoConfig.Clone">
+            <summary>
+            Torna o objeto clonavel
+            </summary>
+            <returns>Clone do objeto</returns>
+        </member>
+        <member name="T:NexTeckLib.ErroConfig">
+            <summary>
+            Classe que será serializada com as exceções e suas datas
+            Leonardo Costa 30/10/2015
+            </summary>
+        </member>
+        <member name="T:NexTeckLib.ErroConfig.Erro">
+            <summary>
+            Struct que representa um erro
+            </summary>
+        </member>
+        <member name="F:NexTeckLib.ErroConfig.erros">
+            <summary>
+            Lista de exceções e suas datas
+            Leonardo Costa 30/10/2015
+            </summary>
+        </member>
+        <member name="M:NexTeckLib.ErroConfig.AddError(System.Exception)">
+            <summary>
+            Adiciona uma exceção no objeto.
+            Leonardo Costa 30/10/2015
+            </summary>
+            <param name="ex">Exceção</param>
+        </member>
+        <member name="M:NexTeckLib.ErroConfig.AddErrorRange(System.Exception[])">
+            <summary>
+            Adiciona um conjunto de Exceptions
+            Leonardo Costa 30/10/2015
+            </summary>
+            <param name="ex">Conjunto de exceções. Não é necessário adicionar InnerExceptions, somente a BaseException</param>
+        </member>
+        <member name="M:NexTeckLib.ErroConfig.#ctor(System.Exception)">
+            <summary>
+            Construtor que inicializa o objeto com uma exceção
+            Leonardo Costa 30/10/2015
+            </summary>
+            <param name="ex">Primeira exceção no objeto</param>
+        </member>
+        <member name="M:NexTeckLib.ErroConfig.#ctor">
+            <summary>
+            Construtor que inicializa um objeto vazio
+            Leonardo Costa 30/10/2015
+            </summary>
+        </member>
+        <member name="T:NexTeckLib.ExceptionHandler">
+            <summary>
+            Serve para tratar, exibir e relatar exceções do sistema, tanto exceções previstas como imprevistas pelo desenvolvedor. Pode exibir mensagens detalhadas para desenvolvedores ou simples para usuários e salvar relatórios de erros de acordo com a intensidade. Funciona atualmente com WindowsForms, WPF e Console. 
+            leonardoteck 04/02/2016
+            </summary>
+        </member>
+        <member name="F:NexTeckLib.ExceptionHandler.recover">
+            <summary>
+            Objeto que cria um thread pra tentar salvar o estado atual do sistema
+            leonardoteck 28/10/2015
+            </summary>
+        </member>
+        <member name="P:NexTeckLib.ExceptionHandler.ExibeErrosProgramador">
+            <summary>
+            Variável que indica se qualquer detalhe sobre os erros será exibido
+            leonardoteck 07/02/2016
+            </summary>
+        </member>
+        <member name="P:NexTeckLib.ExceptionHandler.SalvarRelatoriosDeErros">
+            <summary>
+            Só pra não ficar salvando relatórios enquanto o sistema é desenvolvido
+            leonardoteck 28/10/2015
+            </summary>
+        </member>
+        <member name="P:NexTeckLib.ExceptionHandler.ExibeDetalhesDeErros">
+            <summary>
+            Define se devem ser exibidas as InnerExceptions da Exception
+            leonardoteck 28/10/2015
+            </summary>
+        </member>
+        <member name="M:NexTeckLib.ExceptionHandler.ExibirErro(System.Exception,System.String,NexTeckLib.ExceptionHandler.IntensidadeErro)">
+            <summary>
+            Exibe uma mensagem de erro ao usuário ou programador e gera relatórios de erros, salvos num arquivo.
+            leonardoteck 07/02/2016
+            </summary>
+            <param name="ex">Exceção a ser relatada</param>
+            <param name="mensagemUsuario">Mensagem a ser exibida ao usuário. Se o parâmetro não for passado, se for vazio, nulo,
+            e a intensidade do erro for diferente de gravissimo, não será exibida a mensagem</param>
+            <param name="intensidade">Intensidade do erro</param>
+        </member>
+        <member name="M:NexTeckLib.ExceptionHandler.ConstruirMensagemErro(System.Exception)">
+            <summary>
+            Reúne dados do StackTrace e da exceção em uma string.
+            leonardoteck 07/02/2016
+            </summary>
+            <param name="ex">Exceção de onde serão extraídos os dados</param>
+            <returns>Retorna a string formatada</returns>
+        </member>
+        <member name="M:NexTeckLib.ExceptionHandler.ExibirMensagem(System.String,System.Boolean)">
+            <summary>
+            Método universal para exibir mensagens de alerta ao usuário. Funciona com WFA, WPF e Console.
+            leoanrdoteck 07/02/2016
+            </summary>
+            <param name="mensagem">Mensagem a ser exibida</param>
+            <param name="perguntar">Perguntar sim (retorna true) ou não (retorna false)</param>
+            <returns>Resposta sim retorna true e não retorna false</returns>
+            <TODO>
+            Corrigir exibição das mensagens em Console
+            </TODO>
+        </member>
+        <member name="M:NexTeckLib.ExceptionHandler.Iniciar(System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Configura o comportamento geral do ExceptionHandler e adiciona eventos para exceções não tratadas em todos os níveis da aplicação.
+            Deve ser chamado no inicio do programa.
+            leonardoteck 07/02/2016
+            </summary>
+        </member>
+        <member name="M:NexTeckLib.ExceptionHandler.recover_DoWork(System.Object,System.ComponentModel.DoWorkEventArgs)">
+            <summary>
+            Evento executado de forma assíncrona que tenta salvar o relatório
+            leonardoteck 30/10/2015
+            </summary>
+            <TODO>
+            Muda pra salvar os arquivos com a data (um arquivo de log por dia). Ex.: ErroConfig_08/02/16.bin
+            E dentro de uma pasta. Ex.: ErroConfig Logs
+            </TODO>
+        </member>
+        <member name="M:NexTeckLib.ExceptionHandler.recover_RunWorkerCompleted(System.Object,System.ComponentModel.RunWorkerCompletedEventArgs)">
+            <summary>
+            Reinicia o sistema se a intensidade do erro é gravissima, assim que termina de salvar o relatório
+            leonardoteck 30/10/2015
+            </summary>
+        </member>
+        <member name="T:NexTeckLib.ExceptionHandler.IntensidadeErro">
+            <summary>
+            Enumera a intensidade do erro, para definir o que deve ser feito
+            leonardoteck 28/10/2015
+            </summary>
+        </member>
+        <member name="F:NexTeckLib.ExceptionHandler.IntensidadeErro.Simples">
+            <summary>
+            Erro banal, não é necessário interromper a atividade do sistema
+            leonardoteck 28/10/2015
+            </summary>
+        </member>
+        <member name="F:NexTeckLib.ExceptionHandler.IntensidadeErro.Grave">
+            <summary>
+            Salva tudo que puder
+            leonardoteck 28/10/2015
+            </summary>
+        </member>
+        <member name="F:NexTeckLib.ExceptionHandler.IntensidadeErro.Gravissimo">
+            <summary>
+            Erro fatal, toda atividade do sistema deve ser interrompida imediatamente e o programador deve ser contatado
+            leonardoteck 28/10/2015
+            </summary>
+        </member>
+        <member name="T:NexTeckLib.TaskExHandler">
+            <summary>
+            Classe que trata e gera relatório de exceções não tratadas em Tasks
+            Leonardo Costa 30/10/2015
+            </summary>
+        </member>
+        <member name="M:NexTeckLib.TaskExHandler.StarNew(System.Action,System.String)">
+            <summary>
+            Inicia uma nova Task e adiciona um handler para exceções não tratadas.
+            Se erros de programador não são exibidos, não será exibida mensag
+            Leonardo Costa 30/10/2015
+            </summary>
+            <param name="act">O delegate a ser executado de forma assíncrona</param>
+            <param name="mensagem">Mensagem a ser exibida caso ocorra uma exceção na Task.
+            Se o parâmetro não for passado, se for vazio, nulo, e não são exibidos erros de programador
+            não será exibida mensagem ao usuário.</param>
+            <returns>Retorna a Task iniciada com o handler</returns>
+        </member>
+        <member name="M:NexTeckLib.TaskExHandler.AddExceptionHandlerExt(System.Threading.Tasks.Task)">
+            <summary>
+            Extensão que adiciona um Handler para gerar relatórios de exceções não tratadas
+            Leonardo Costa 30/10/2015
+            </summary>
+            <returns>Retorna a Task com o Handler</returns>
+        </member>
+        <member name="M:NexTeckLib.TaskExHandler.AddExceptionHandler(System.Threading.Tasks.Task)">
+            <summary>
+            Método que adiciona um Handler para gerar relatórios de exceções não tratadas
+            Leonardo Costa 30/10/2015
+            </summary>
+            <param name="t">Task que receberá o Handler</param>
+            <returns>Retorna a Task com o Handler</returns>
+        </member>
+        <member name="M:NexTeckLib.TaskExHandler.ExceptionHandler(System.Threading.Tasks.Task)">
+            <summary>
+            Gera o relatório da exceção da Task
+            Leonardo Costa 30/10/2015
+            </summary>
+            <param name="task">Task que foi interrompida por uma exceção não tratada</param>
+        </member>
+    </members>
+</doc>
