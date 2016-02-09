@@ -24,7 +24,6 @@
             <summary>
             Carrega um objeto de configuração de um diretório específico, se ele não existe então é criado
             </summary>
-            <param name="dir">O diretorio a ser carregado</param>
         </member>
         <member name="T:NexTeckLib.Configuracoes">
             <summary>
@@ -56,12 +55,13 @@
             Flag para não alertar mais de uma vez de que precisa configurar
             </summary>
         </member>
-        <member name="M:NexTeckLib.Configuracoes.Configurar(System.String,NexTeckLib.TipoProjeto)">
+        <member name="M:NexTeckLib.Configuracoes.Configurar(System.String,NexTeckLib.TipoProjeto,System.Boolean)">
             <summary>
             Define as variáveis de configuração
             </summary>
             <param name="nomePrograma">O nome deste software</param>
             <param name="tipoProjeto">Tipo do projeto</param>
+            <param name="iniciarEH">Define se será chamado o método NexTeckLib.ExceptionHandler.Iniciar(), com valores default nos parâmetros</param>
         </member>
         <member name="T:NexTeckLib.TipoProjeto">
             <summary>
@@ -137,17 +137,21 @@
         </member>
         <member name="T:NexTeckLib.ExceptionHandler">
             <summary>
-            Serve para tratar, exibir e relatar exceções do sistema, tanto exceções previstas como imprevistas pelo desenvolvedor. Pode exibir mensagens detalhadas para desenvolvedores ou simples para usuários e salvar relatórios de erros de acordo com a intensidade. Funciona atualmente com WindowsForms, WPF e Console. 
+            Serve para tratar, exibir e relatar exceções do software, tanto exceções previstas como imprevistas pelo desenvolvedor. Pode exibir mensagens detalhadas para desenvolvedores ou simples para usuários e salvar relatórios de erros de acordo com a intensidade. Funciona atualmente com WindowsForms, WPF e Console. 
             leonardoteck 04/02/2016
             </summary>
         </member>
-        <member name="F:NexTeckLib.ExceptionHandler.recover">
+        <member name="P:NexTeckLib.ExceptionHandler.VaiReiniciar">
             <summary>
-            Objeto que cria um thread pra tentar salvar o estado atual do sistema
-            leonardoteck 28/10/2015
+            Diz em tempo de execução se ocorreu alguma exceção gravíssima e a aplicação deve ser reiniciada
             </summary>
         </member>
-        <member name="P:NexTeckLib.ExceptionHandler.ExibeErrosProgramador">
+        <member name="P:NexTeckLib.ExceptionHandler.Reiniciar">
+            <summary>
+            Define se o aplicativo deve ser reiniciado quando ocorrer um erro gravíssimo (ou seja, exceções não tratadas)
+            </summary>
+        </member>
+        <member name="P:NexTeckLib.ExceptionHandler.ModoProgramador">
             <summary>
             Variável que indica se qualquer detalhe sobre os erros será exibido
             leonardoteck 07/02/2016
@@ -155,14 +159,19 @@
         </member>
         <member name="P:NexTeckLib.ExceptionHandler.SalvarRelatoriosDeErros">
             <summary>
-            Só pra não ficar salvando relatórios enquanto o sistema é desenvolvido
+            Define se os relatórios devem ser salvos automaticamente
             leonardoteck 28/10/2015
             </summary>
         </member>
-        <member name="P:NexTeckLib.ExceptionHandler.ExibeDetalhesDeErros">
+        <member name="F:NexTeckLib.ExceptionHandler.recover">
             <summary>
-            Define se devem ser exibidas as InnerExceptions da Exception
+            Objeto que cria um thread pra tentar salvar o estado atual do aplicativo
             leonardoteck 28/10/2015
+            </summary>
+        </member>
+        <member name="F:NexTeckLib.ExceptionHandler.fila">
+            <summary>
+            Lista de exceções lançadas que devem ser salvas no relatório
             </summary>
         </member>
         <member name="M:NexTeckLib.ExceptionHandler.ExibirErro(System.Exception,System.String,NexTeckLib.ExceptionHandler.IntensidadeErro)">
@@ -201,6 +210,9 @@
             Deve ser chamado no inicio do programa.
             leonardoteck 07/02/2016
             </summary>
+            <param name="modoProgramador">Define se serão exibidos detalhes técnicos sobre os erros</param>
+            <param name="salvarErros">Define se serão salvos relatórios sobre os erros</param>
+            <param name="reiniciar">Define se a aplicação deve ser reiniciada após um erro gravíssimo (ou seja, exceção não tratada)</param>
         </member>
         <member name="M:NexTeckLib.ExceptionHandler.recover_DoWork(System.Object,System.ComponentModel.DoWorkEventArgs)">
             <summary>
@@ -214,7 +226,7 @@
         </member>
         <member name="M:NexTeckLib.ExceptionHandler.recover_RunWorkerCompleted(System.Object,System.ComponentModel.RunWorkerCompletedEventArgs)">
             <summary>
-            Reinicia o sistema se a intensidade do erro é gravissima, assim que termina de salvar o relatório
+            Reinicia o aplicativo se a intensidade do erro é gravissima, assim que termina de salvar o relatório
             leonardoteck 30/10/2015
             </summary>
         </member>
@@ -226,7 +238,7 @@
         </member>
         <member name="F:NexTeckLib.ExceptionHandler.IntensidadeErro.Simples">
             <summary>
-            Erro banal, não é necessário interromper a atividade do sistema
+            Erro banal, não é necessário interromper a atividade da aplicação
             leonardoteck 28/10/2015
             </summary>
         </member>
@@ -238,7 +250,7 @@
         </member>
         <member name="F:NexTeckLib.ExceptionHandler.IntensidadeErro.Gravissimo">
             <summary>
-            Erro fatal, toda atividade do sistema deve ser interrompida imediatamente e o programador deve ser contatado
+            Erro fatal, toda atividade da aplicação deve ser interrompida imediatamente e o programador deve ser contatado
             leonardoteck 28/10/2015
             </summary>
         </member>

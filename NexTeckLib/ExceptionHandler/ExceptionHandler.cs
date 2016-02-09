@@ -7,56 +7,55 @@ using System.Threading;
 namespace NexTeckLib
 {
     /// <summary>
-    /// Serve para tratar, exibir e relatar exceções do sistema, tanto exceções previstas como imprevistas pelo desenvolvedor. Pode exibir mensagens detalhadas para desenvolvedores ou simples para usuários e salvar relatórios de erros de acordo com a intensidade. Funciona atualmente com WindowsForms, WPF e Console. 
+    /// Serve para tratar, exibir e relatar exceções do software, tanto exceções previstas como imprevistas pelo desenvolvedor. Pode exibir mensagens detalhadas para desenvolvedores ou simples para usuários e salvar relatórios de erros de acordo com a intensidade. Funciona atualmente com WindowsForms, WPF e Console. 
     /// leonardoteck 04/02/2016
     /// </summary>
     public static class ExceptionHandler
     {
         #region Atributos
-        private static bool salvarRelatoriosDeErros = true;
-        private static bool exibeDetalhesDeErros = true;
-        // só pra saber se precisa reiniciar o software após salvar relatórios
-        private static bool reiniciar;
-        // fila de exceções 
-        private static Queue<Exception> fila = new Queue<Exception>();
-
+        private static bool vaiReiniciar;
         /// <summary>
-        /// Objeto que cria um thread pra tentar salvar o estado atual do sistema
-        /// leonardoteck 28/10/2015
+        /// Diz em tempo de execução se ocorreu alguma exceção gravíssima e a aplicação deve ser reiniciada
         /// </summary>
-        private static BackgroundWorker recover = new BackgroundWorker();
+        private static bool VaiReiniciar
+        {
+            get { return vaiReiniciar; }
+            set
+            {
+                if (Reiniciar && value)
+                    vaiReiniciar = true;
+                else
+                    vaiReiniciar = false;
+            }
+        }            
+            
+        /// <summary>
+        /// Define se o aplicativo deve ser reiniciado quando ocorrer um erro gravíssimo (ou seja, exceções não tratadas)
+        /// </summary>
+        public static bool Reiniciar { get; set; }
 
         /// <summary>
         /// Variável que indica se qualquer detalhe sobre os erros será exibido
         /// leonardoteck 07/02/2016
         /// </summary>
-        public static bool ExibeErrosProgramador { get; set; }
+        public static bool ModoProgramador { get; set; }
 
         /// <summary>
-        /// Só pra não ficar salvando relatórios enquanto o sistema é desenvolvido
+        /// Define se os relatórios devem ser salvos automaticamente
         /// leonardoteck 28/10/2015
         /// </summary>
-        public static bool SalvarRelatoriosDeErros
-        {
-            get { return salvarRelatoriosDeErros; }
-            set { salvarRelatoriosDeErros = value; }
-        }
+        public static bool SalvarRelatoriosDeErros { get; set; }
 
         /// <summary>
-        /// Define se devem ser exibidas as InnerExceptions da Exception
+        /// Objeto que cria um thread pra tentar salvar o estado atual do aplicativo
         /// leonardoteck 28/10/2015
         /// </summary>
-        public static bool ExibeDetalhesDeErros
-        {
-            get { return exibeDetalhesDeErros; }
-            set
-            {
-                if (ExibeErrosProgramador && value)
-                    exibeDetalhesDeErros = value;
-                else
-                    exibeDetalhesDeErros = false;
-            }
-        }
+        private static BackgroundWorker recover = new BackgroundWorker();
+
+        /// <summary>
+        /// Lista de exceções lançadas que devem ser salvas no relatório
+        /// </summary>
+        private static Queue<Exception> fila = new Queue<Exception>();
         #endregion
 
         /// <summary>
@@ -69,7 +68,7 @@ namespace NexTeckLib
         /// <param name="intensidade">Intensidade do erro</param>
         public static void ExibirErro(Exception ex, string mensagemUsuario = "", IntensidadeErro intensidade = IntensidadeErro.Grave)
         {
-            if (intensidade > 0 && salvarRelatoriosDeErros)
+            if (intensidade > 0 && SalvarRelatoriosDeErros)
             {
                 fila.Enqueue(ex);
                 if (!recover.IsBusy)
@@ -77,28 +76,31 @@ namespace NexTeckLib
             }
 
             string mensagem = mensagemUsuario;
-            if (ExibeErrosProgramador)
+            if (ModoProgramador)
             {
-                mensagem += ConstruirMensagemErro(ex);
+                mensagem += Environment.NewLine + Environment.NewLine + ConstruirMensagemErro(ex);
 
-                bool perguntar = ExibeDetalhesDeErros && ex.InnerException != null;
+                bool perguntar = ex.InnerException != null;
                 if (perguntar)
-                    mensagem += "Deseja mais detalhes?";
+                    mensagem += Environment.NewLine + "Deseja mais detalhes?";
 
                 bool detalhes = ExibirMensagem(mensagem, perguntar);
 
                 if (detalhes && perguntar)
                 {
-                    mensagem = "Exceções internas:";
+                    if (Configuracoes.TipoProjeto == TipoProjeto.Console)
+                        mensagem = Environment.NewLine + "Exceções internas:";
+                    else
+                        mensagem = "Exceções internas:";
                     Exception inner = ex.InnerException;
                     int numEx = 1;
                     while (inner != null)
                     {
-                        mensagem += "Ex. interna " + numEx++ + ": " + ConstruirMensagemErro(inner);
+                        mensagem += Environment.NewLine + Environment.NewLine + "Ex. interna " + numEx++ + ": " + ConstruirMensagemErro(inner);
                         inner = inner.InnerException;
                     }
 
-                    if (!(intensidade > 0 && salvarRelatoriosDeErros))
+                    if (!(intensidade > 0 && SalvarRelatoriosDeErros))
                     {
                         mensagem += Environment.NewLine + Environment.NewLine + "Salvar relatório deste erro?";
                         bool salvar = ExibirMensagem(mensagem, true);
@@ -121,13 +123,13 @@ namespace NexTeckLib
                     ExibirMensagem(mensagem, false);
             }
 
-            if (intensidade == IntensidadeErro.Gravissimo && fila.Count == 0 && !recover.IsBusy)
+            if (intensidade == IntensidadeErro.Gravissimo && fila.Count == 0 && !recover.IsBusy && Reiniciar)
             {
                 Process.Start(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
                 Process.GetCurrentProcess().Kill();
             }                
             else
-                reiniciar = true;
+                VaiReiniciar = true;
         }
 
         /// <summary>
@@ -151,10 +153,10 @@ namespace NexTeckLib
                 linha = sf.GetFileLineNumber().ToString();
             }
 
-            arquivo = !string.IsNullOrEmpty(arquivo) ? arquivo = System.IO.Path.GetFileName(arquivo) : "n/a";
+            arquivo = !string.IsNullOrEmpty(arquivo) ? System.IO.Path.GetFileName(arquivo) : "n/a";
             if (string.IsNullOrEmpty(linha)) linha = "n/a";
 
-            return Environment.NewLine + Environment.NewLine + "Exceção principal: " + ex.Message + Environment.NewLine + "Arquivo: " + arquivo + Environment.NewLine + "Linha: " + linha;
+            return "Mensagem da exceção: " + ex.Message + Environment.NewLine + "Arquivo: " + arquivo + Environment.NewLine + "Linha: " + linha;
         }
 
         /// <summary>
@@ -164,9 +166,6 @@ namespace NexTeckLib
         /// <param name="mensagem">Mensagem a ser exibida</param>
         /// <param name="perguntar">Perguntar sim (retorna true) ou não (retorna false)</param>
         /// <returns>Resposta sim retorna true e não retorna false</returns>
-        /// <TODO>
-        /// Corrigir exibição das mensagens em Console
-        /// </TODO>
         public static bool ExibirMensagem(string mensagem, bool perguntar)
         {
             if (Configuracoes.TipoProjeto == TipoProjeto.WFA)
@@ -207,15 +206,18 @@ namespace NexTeckLib
 
             return true;
         }
-        
+
         /// <summary>
         /// Configura o comportamento geral do ExceptionHandler e adiciona eventos para exceções não tratadas em todos os níveis da aplicação.
         /// Deve ser chamado no inicio do programa.
         /// leonardoteck 07/02/2016
         /// </summary>
-        public static void Iniciar(bool exibirErros = true, bool salvarErros= true, bool exibirDetalhes = true)
+        /// <param name="modoProgramador">Define se serão exibidos detalhes técnicos sobre os erros</param>
+        /// <param name="salvarErros">Define se serão salvos relatórios sobre os erros</param>
+        /// <param name="reiniciar">Define se a aplicação deve ser reiniciada após um erro gravíssimo (ou seja, exceção não tratada)</param>
+        public static void Iniciar(bool modoProgramador = true, bool salvarErros= true, bool reiniciar = true)
         {
-            // Tratamento de exceções não tratadas e de exceções dos Threads dos Forms
+            // Tratamento de exceções não tratadas
             AppDomain.CurrentDomain.UnhandledException += AppDomain_UnhandledException;
             System.Threading.Tasks.TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
 
@@ -230,15 +232,14 @@ namespace NexTeckLib
             recover.RunWorkerCompleted += recover_RunWorkerCompleted;
                         
             // Define as configurações básicas
-            ExibeErrosProgramador = exibirErros;
+            ModoProgramador = modoProgramador;
             SalvarRelatoriosDeErros = salvarErros;
-            exibeDetalhesDeErros = exibirDetalhes;
+            Reiniciar = reiniciar;
         }
         
         #region Eventos
         private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
         {
-            // Gera o relatório do erro e reinicia o sistema
             ExibirErro(e.Exception, "Ops, ocorreu um erro", IntensidadeErro.Gravissimo);
         }
 
@@ -284,14 +285,14 @@ namespace NexTeckLib
         }
 
         /// <summary>
-        /// Reinicia o sistema se a intensidade do erro é gravissima, assim que termina de salvar o relatório
+        /// Reinicia o aplicativo se a intensidade do erro é gravissima, assim que termina de salvar o relatório
         /// leonardoteck 30/10/2015
         /// </summary>
         private static void recover_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (fila.Count > 0)
                 recover.RunWorkerAsync();
-            else if (reiniciar)
+            else if (VaiReiniciar)
             {
                 Process.Start(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
                 Process.GetCurrentProcess().Kill();
@@ -306,7 +307,7 @@ namespace NexTeckLib
         public enum IntensidadeErro
         {
             /// <summary>
-            /// Erro banal, não é necessário interromper a atividade do sistema
+            /// Erro banal, não é necessário interromper a atividade da aplicação
             /// leonardoteck 28/10/2015
             /// </summary>
             Simples = 0,
@@ -316,7 +317,7 @@ namespace NexTeckLib
             /// </summary>
             Grave,
             /// <summary>
-            /// Erro fatal, toda atividade do sistema deve ser interrompida imediatamente e o programador deve ser contatado
+            /// Erro fatal, toda atividade da aplicação deve ser interrompida imediatamente e o programador deve ser contatado
             /// leonardoteck 28/10/2015
             /// </summary>
             Gravissimo

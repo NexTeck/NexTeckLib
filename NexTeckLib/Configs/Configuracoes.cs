@@ -52,11 +52,14 @@ namespace NexTeckLib
         /// </summary>
         /// <param name="nomePrograma">O nome deste software</param>
         /// <param name="tipoProjeto">Tipo do projeto</param>
-        public static void Configurar(string nomePrograma, TipoProjeto tipoProjeto)
+        /// <param name="iniciarEH">Define se será chamado o método NexTeckLib.ExceptionHandler.Iniciar(), com valores default nos parâmetros</param>
+        public static void Configurar(string nomePrograma, TipoProjeto tipoProjeto, bool iniciarEH = true)
         {
             NomePrograma = nomePrograma == null ? "" : nomePrograma;
             TipoProjeto = tipoProjeto;
             configurado = true;
+            if (iniciarEH)
+                ExceptionHandler.Iniciar();
         }
     }
     

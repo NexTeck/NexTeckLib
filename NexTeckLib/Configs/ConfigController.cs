@@ -51,7 +51,6 @@ namespace NexTeckLib
         /// <summary>
         /// Carrega um objeto de configuração de um diretório específico, se ele não existe então é criado
         /// </summary>
-        /// <param name="dir">O diretorio a ser carregado</param>
         public static ObjetoConfig CarregarOuCriar(Type tipo)
         {
             ObjetoConfig objetoConfig = null;
